@@ -33,7 +33,7 @@ def afficher_menu():
     print("2 -> Ajouter un individu (Non implémenté)")
     print("3 -> Ajouter une nouvelle nage (Non implémenté)")
     print("4 -> Lister toutes les performances")
-    print("5 -> Lister les performances d'un nageur")
+    print("5 -> Lister les performances d'un nageur (avec statistiques)")
     print("6 -> Lister les nageurs pratiquant une nage")
     print("7 -> Sauvegarder les données")
     print("8 -> Charger les données")
@@ -57,18 +57,32 @@ def cmd_liste(liste):
         print(f" {elt[0]:11}| {elt[1]:8}|  {elt[2]:8} | {elt[3]}")
 
 def cmd_nageur(liste):
-    """Affiche toutes les performances d'un nageur"""
+    """Affiche toutes les performances d'un nageur avec statistiques"""
     tmp = input("Nom du nageur : ")
-    print(f"\nPerformances de {tmp}")
-    print("  Nage   |  Longueur |  Date")
-    print("------------------------------")
-    found = False
-    for elt in liste:
-        if elt[0] == tmp:
-            print(f" {elt[1]:8}|  {elt[2]:8} | {elt[3]}")
-            found = True
-    if not found:
+    performances = [elt for elt in liste if elt[0] == tmp]
+
+    if not performances:
         print("Aucune performance trouvée pour ce nageur.")
+        return
+
+    print(f"\nPerformances de {tmp}")
+    print("  Nage   |  Longueur")
+    print("----------------------")
+    
+    longueurs = []
+    for elt in performances:
+        print(f" {elt[1]:8}|  {elt[2]:8}")
+        longueurs.append(elt[2])
+
+    # Calcul des statistiques
+    min_perf = min(longueurs)
+    max_perf = max(longueurs)
+    moyenne = sum(longueurs) / len(longueurs)
+
+    print("\nStatistiques :")
+    print(f"Minimum  : {min_perf}")
+    print(f"Maximum  : {max_perf}")
+    print(f"Moyenne  : {moyenne:.1f}")
 
 def cmd_nage(liste):
     """Affiche toutes les performances suivant une nage donnée"""
@@ -79,7 +93,7 @@ def cmd_nage(liste):
     found = False
     for elt in liste:
         if elt[1] == tmp:
-            print(f" {elt[0]:11}|  {elt[2]:8} | {elt[3]}")
+            print(f" {elt[0]:11}| {elt[2]:8} | {elt[3]}")
             found = True
     if not found:
         print("Aucun nageur trouvé pour cette nage.")
@@ -143,7 +157,7 @@ while isAlive:
     elif commande == 4:
         cmd_liste(liste)
     elif commande == 5:
-        cmd_nageur(liste)
+        cmd_nageur(liste)  # Maintenant avec statistiques !
     elif commande == 6:
         cmd_nage(liste)
     elif commande == 7:
