@@ -1,5 +1,11 @@
-liste = [("Pierre", "Dos", 10), ("Paul", "Brasse", 13), ("Léa", "Crawl", 6), ("Léa", "Brasse", 8)]
-commande = ''
+from datetime import datetime
+
+liste = [
+    ("Pierre", "Dos", 10, "2024-05-10"),
+    ("Paul", "Brasse", 13, "2024-05-12"),
+    ("Léa", "Crawl", 6, "2024-05-11"),
+    ("Léa", "Brasse", 8, "2024-05-13")
+]
 
 def afficher_menu():
     """Affiche le menu des options disponibles."""
@@ -12,6 +18,7 @@ def afficher_menu():
     print("6 -> Lister les nageurs pratiquant une nage")
     print("7 -> Sauvegarder les données")
     print("8 -> Charger les données")
+    print("9 -> Lister les performances d'un jour")
     print("0 -> Quitter le logiciel")
 
 def get_int_value(prompt):
@@ -22,31 +29,42 @@ def get_int_value(prompt):
         except ValueError:
             print("Veuillez entrer un nombre valide.")
 
+def get_date_value(prompt):
+    """Saisie sécurisée d'une date au format YYYY-MM-DD"""
+    while True:
+        date_str = input(prompt)
+        try:
+            datetime.strptime(date_str, "%Y-%m-%d")  # Vérifie si la date est valide
+            return date_str
+        except ValueError:
+            print("Format invalide. Entrez la date au format YYYY-MM-DD.")
+
 def cmd_ajout(liste):
     """Ajoute un évènement à la liste"""
     a = input("Nom du nageur : ")
     b = input("Type de nage : ")
     c = get_int_value("Nombre de longueurs : ")
-    liste.append((a, b, c))
+    d = get_date_value("Date (YYYY-MM-DD) : ")
+    liste.append((a, b, c, d))
     print("Performance ajoutée avec succès !")
 
 def cmd_liste(liste):
     """Affiche toutes les performances des nageurs"""
-    print("\nPrénom      |  Nage    |  Longueur")
-    print("---------------------------------")
+    print("\nPrénom      |  Nage    |  Longueur |  Date")
+    print("---------------------------------------------")
     for elt in liste:
-        print(f" {elt[0]:11}| {elt[1]:8}|  {elt[2]}")
+        print(f" {elt[0]:11}| {elt[1]:8}|  {elt[2]:8} | {elt[3]}")
 
 def cmd_nageur(liste):
     """Affiche toutes les performances d'un nageur"""
     tmp = input("Nom du nageur : ")
     print(f"\nPerformances de {tmp}")
-    print("  Nage   |  Longueur")
-    print("--------------------")
+    print("  Nage   |  Longueur |  Date")
+    print("------------------------------")
     found = False
     for elt in liste:
         if elt[0] == tmp:
-            print(f" {elt[1]:8}|  {elt[2]}")
+            print(f" {elt[1]:8}|  {elt[2]:8} | {elt[3]}")
             found = True
     if not found:
         print("Aucune performance trouvée pour ce nageur.")
@@ -55,15 +73,29 @@ def cmd_nage(liste):
     """Affiche toutes les performances suivant une nage donnée"""
     tmp = input("Type de nage : ")
     print(f"\nNage : {tmp}")
-    print(" Nageur     |  Longueur")
-    print("------------------------")
+    print(" Nageur     |  Longueur |  Date")
+    print("----------------------------------")
     found = False
     for elt in liste:
         if elt[1] == tmp:
-            print(f" {elt[0]:11}|  {elt[2]}")
+            print(f" {elt[0]:11}|  {elt[2]:8} | {elt[3]}")
             found = True
     if not found:
         print("Aucun nageur trouvé pour cette nage.")
+
+def cmd_par_jour(liste):
+    """Affiche toutes les performances d'une date donnée"""
+    date_recherche = get_date_value("Entrez une date (YYYY-MM-DD) : ")
+    print(f"\nPerformances du {date_recherche}")
+    print(" Nageur     |  Nage    |  Longueur")
+    print("--------------------------------------")
+    found = False
+    for elt in liste:
+        if elt[3] == date_recherche:
+            print(f" {elt[0]:11}| {elt[1]:8}|  {elt[2]:8}")
+            found = True
+    if not found:
+        print("Aucune performance enregistrée ce jour-là.")
 
 def cmd_exit(liste):
     """Demande confirmation avant de quitter"""
@@ -78,7 +110,7 @@ def cmd_save(liste, filename):
     """Sauvegarde la BDD"""
     with open(filename, 'w') as fichier:
         for elt in liste:
-            fichier.write(f"{elt[0]},{elt[1]},{elt[2]}\n")
+            fichier.write(f"{elt[0]},{elt[1]},{elt[2]},{elt[3]}\n")
     print(f"Données sauvegardées dans {filename}.")
 
 def cmd_load(liste, filename):
@@ -90,7 +122,7 @@ def cmd_load(liste, filename):
                 line = line.strip()
                 if line and not line.startswith('#'):
                     tmp = line.split(',')
-                    liste.append((tmp[0], tmp[1], int(tmp[2])))  # Convertir le nombre en entier
+                    liste.append((tmp[0], tmp[1], int(tmp[2]), tmp[3]))  # Convertir le nombre en entier
         print(f"Données chargées depuis {filename}.")
     except FileNotFoundError:
         print("Fichier introuvable. Veuillez sauvegarder d'abord.")
@@ -117,6 +149,8 @@ while isAlive:
         cmd_save(liste, 'save.csv')
     elif commande == 8:
         cmd_load(liste, 'save.csv')
+    elif commande == 9:
+        cmd_par_jour(liste)
     elif commande == 0:
         isAlive = cmd_exit(liste)  # Quitter l'application
     else:
