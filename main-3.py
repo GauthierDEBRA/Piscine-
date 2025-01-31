@@ -1,5 +1,24 @@
 from datetime import datetime
 
+# Fonction pour récupérer une valeur entière en toute sécurité
+def get_int_value(prompt="Valeur ? "):
+    """Saisie sécurisée d'un entier (évite les erreurs de format)"""
+    while True:
+        try:
+            return int(input(prompt))
+        except ValueError:
+            print("Indiquez bien une valeur numérique.")
+
+def get_date_value(prompt="Date (YYYY-MM-DD) : "):
+    """Saisie sécurisée d'une date au format YYYY-MM-DD"""
+    while True:
+        date_str = input(prompt)
+        try:
+            datetime.strptime(date_str, "%Y-%m-%d")  # Vérifie si la date est valide
+            return date_str
+        except ValueError:
+            print("Format invalide. Entrez la date au format YYYY-MM-DD.")
+
 liste = [
     ("Pierre", "Dos", 10, "2024-05-10"),
     ("Paul", "Brasse", 13, "2024-05-12"),
@@ -20,24 +39,6 @@ def afficher_menu():
     print("8 -> Charger les données")
     print("9 -> Lister les performances d'un jour")
     print("0 -> Quitter le logiciel")
-
-def get_int_value(prompt):
-    """Saisie sécurisée d'un entier"""
-    while True:
-        try:
-            return int(input(prompt))
-        except ValueError:
-            print("Veuillez entrer un nombre valide.")
-
-def get_date_value(prompt):
-    """Saisie sécurisée d'une date au format YYYY-MM-DD"""
-    while True:
-        date_str = input(prompt)
-        try:
-            datetime.strptime(date_str, "%Y-%m-%d")  # Vérifie si la date est valide
-            return date_str
-        except ValueError:
-            print("Format invalide. Entrez la date au format YYYY-MM-DD.")
 
 def cmd_ajout(liste):
     """Ajoute un évènement à la liste"""
